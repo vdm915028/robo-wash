@@ -87,10 +87,9 @@ The bar for a remark is high. Raise only two kinds of thing:
 - a direct violation of a rule written in this file.
 
 Everything else stays unsaid. No style nitpicks, no speculation, no "this could also be done differently".
-The simplifications listed in README ("Что намеренно не
-делаем") are deliberate and are never findings. Never raise: missing tests, missing interfaces or abstraction
-layers, a state-management library, JSDoc or XML docs, error handling beyond what a demo needs, a different
-library or stack, linter and formatter setup.
+The simplifications listed in README ("Что намеренно не делаем") are deliberate and are never findings. Never
+raise: missing tests, missing interfaces or abstraction layers, a state-management library, JSDoc or XML docs,
+error handling beyond what a demo needs, a different library or stack, linter and formatter setup.
 
 Findings land on the pull request as inline comments on the lines they concern. Every run ends with one summary
 comment: whether the changes match the pull request title and description, what was found, and whether it can be
