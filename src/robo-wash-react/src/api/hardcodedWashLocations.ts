@@ -3,13 +3,45 @@ import type { WashLocation, WashMode } from './contracts';
 // Этап 1: локации живут на клиенте, на этапе 3 этот модуль заменит запрос к RoboWash.Api.
 // Адреса и координаты — правдоподобные демо-данные, реальные точки моек тут не заведены.
 
-const expressWashMode: WashMode = { id: 1, name: 'Экспресс', priceRub: 500, durationMinutes: 5 };
-const standardWashMode: WashMode = { id: 2, name: 'Стандарт', priceRub: 700, durationMinutes: 8 };
-const premiumWashMode: WashMode = { id: 3, name: 'Премиум', priceRub: 950, durationMinutes: 11 };
+const expressWashMode: WashMode = {
+    id: 1,
+    name: 'Экспресс',
+    priceRub: 500,
+    durationMinutes: 5,
+    description: 'Быстрая бесконтактная мойка кузова без сушки.',
+    steps: ['Ополаскивание', 'Эмульсия', 'Смыв водой'],
+};
 
-// Премиум-программу тянет только новое оборудование.
+const standardWashMode: WashMode = {
+    id: 2,
+    name: 'Стандарт',
+    priceRub: 700,
+    durationMinutes: 8,
+    description: 'Базовый режим на каждый день: цветная пена и обдув.',
+    steps: ['Ополаскивание', 'Эмульсия', 'Смыв водой', 'Цветная пена', 'Обдув'],
+};
+
+const luxuryWashMode: WashMode = {
+    id: 3,
+    name: 'Люкс',
+    priceRub: 950,
+    durationMinutes: 11,
+    description: 'Полная программа: диски, гидрофобное покрытие и ополаскивание осмосом.',
+    steps: [
+        'Ополаскивание',
+        'Эмульсия',
+        'Смыв водой',
+        'Цветная пена',
+        'Мойка дисков',
+        'Гидрофоб',
+        'Осмос',
+        'Обдув 2x',
+    ],
+};
+
+// Люкс-программу тянет только новое оборудование.
 const legacyRobotWashModes = [expressWashMode, standardWashMode];
-const modernRobotWashModes = [expressWashMode, standardWashMode, premiumWashMode];
+const modernRobotWashModes = [expressWashMode, standardWashMode, luxuryWashMode];
 
 export const hardcodedWashLocations: WashLocation[] = [
     {
