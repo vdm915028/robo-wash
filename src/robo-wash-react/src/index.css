@@ -1,0 +1,13 @@
+@import 'tailwindcss';
+
+@theme {
+    --color-brand: #1266d4;
+}
+
+/* Карта занимает весь экран, поэтому гасим «резиновый» скролл — иначе на мобильном она уезжает за края. */
+html,
+body,
+#root {
+    height: 100%;
+    overscroll-behavior: none;
+}

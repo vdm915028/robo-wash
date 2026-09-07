@@ -18,6 +18,7 @@ src/robo-wash-react/      React + TypeScript (Vite), opened separately in VS Cod
   src/pages/              MapPage, LocationPage, WashSessionPage, HistoryPage
   src/components/         shared UI
   src/hooks/              useDeviceId and friends
+  src/utils/              pure helpers (no I/O, no React)
 .github/workflows/        CI (tests + review agent) and CD (Cloud Run)
 Dockerfile                builds the client, serves it from the API
 ```
@@ -54,7 +55,8 @@ Code, identifiers and file names — English. UI strings — Russian. Comments m
 - Keep the API surface in `src/api`; components never call `fetch` directly.
 - The map is 2GIS MapGL (`@2gis/mapgl`), which is imperative and has no React wrapper: create the map in an
   effect against a container ref, destroy it on unmount, and keep every marker call inside the map component so
-  the instance never leaks into the rest of the tree.
+  the instance never leaks into the rest of the tree. Markers belong in their own effect — data changes must
+  re-create markers, never the map, or the user loses the position and zoom they set by hand.
 
 ## Comments
 
@@ -69,7 +71,9 @@ Lines up to ~125 chars. Don't break short statements across lines.
 
 - Never `git commit`, `git push` or open a pull request. The user does that. Leave the working tree review-ready.
 - One feature branch per feature.
-- Never install packages. State the top-level package name and version, then stop — the user installs it.
+- Packages are approved before they are installed (npm and NuGet alike): list every package with vendor, version
+  and what it is needed for, wait for the user's go-ahead, then run the install yourself. This project rule wins
+  over any standing "never install" preference.
 - When the user gives a code-style correction that generalises, add it to this file instead of only fixing the
   current spot.
 
