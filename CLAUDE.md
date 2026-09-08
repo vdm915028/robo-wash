@@ -15,7 +15,7 @@ src/RoboWash.Api/         net10.0 — Controllers, Services, Data (DbContext, en
 src/RoboWash.xUnit/       unit and integration tests
 src/robo-wash-react/      React + TypeScript (Vite), opened separately in VS Code
   src/api/                HTTP client + DTO types mirroring the API contracts
-  src/pages/              LocationPage, WashSessionPage, HistoryPage — routed screens drawn over the map
+  src/pages/              LocationPage, TerminalPage, WashSessionPage, HistoryPage — screens drawn over the map
   src/components/         shared UI
   src/hooks/              useDeviceId and friends
   src/utils/              pure helpers (no I/O, no React)
@@ -97,6 +97,9 @@ The bar for a remark is high. Raise only two kinds of thing:
 Everything else stays unsaid. No style nitpicks, no speculation, no "this could also be done differently". A
 finding you could not verify is not a finding: when the dependencies, toolchain or data needed to check it are
 out of reach, say nothing — a caveat does not turn a guess into a remark worth making.
+Check what you can with the toolchain — the installed typings, `tsc --noEmit`, a build, a grep. Never start the
+app or drive it in a browser: that check runs separately, once, at the end of the client work and over a short
+list of cases, because it costs far more time than it returns on a single branch.
 The simplifications listed in README ("Что намеренно не делаем") are deliberate and are never findings. Never
 raise: missing tests, missing interfaces or abstraction layers, a state-management library, JSDoc or XML docs,
 error handling beyond what a demo needs, a different library or stack, linter and formatter setup.

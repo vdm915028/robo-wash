@@ -38,9 +38,7 @@ export function LocationPage() {
                 </Link>
             </div>
 
-            {/* Нижний отступ уводит последний режим из-под логотипа 2GIS: логотип рисуется поверх шторки,
-                а убирать его нельзя — это условие использования карты. */}
-            <div className="overflow-y-auto px-4 pt-2 pb-14">
+            <div className="flex-1 overflow-y-auto px-4 pt-2 pb-2">
                 <div className="flex flex-wrap gap-2">
                     {washLocation.robotEquipmentGeneration === 'Modern' && (
                         <span className="bg-brand/10 text-brand rounded-full px-2.5 py-1 text-xs font-medium">
@@ -54,6 +52,16 @@ export function LocationPage() {
 
                 <h2 className="mt-5 mb-3 text-base font-semibold text-slate-900">Режимы мойки</h2>
                 <WashModeList washModes={washLocation.washModes} />
+            </div>
+
+            {/* Нижний отступ уводит кнопку из-под логотипа 2GIS: он рисуется поверх шторки, убирать его нельзя. */}
+            <div className="px-4 pt-3 pb-12">
+                <Link
+                    to={`/locations/${washLocation.id}/terminal`}
+                    className="bg-brand block w-full rounded-2xl py-3.5 text-center font-semibold text-white"
+                >
+                    Я у терминала
+                </Link>
             </div>
         </section>
     );
