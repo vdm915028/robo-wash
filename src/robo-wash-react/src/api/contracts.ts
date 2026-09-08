@@ -5,6 +5,8 @@ export interface WashMode {
     name: string;
     priceRub: number;
     durationMinutes: number;
+    description: string;
+    steps: string[];
 }
 
 export interface WashLocation {

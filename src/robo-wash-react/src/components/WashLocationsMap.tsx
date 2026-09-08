@@ -2,11 +2,18 @@ import { load } from '@2gis/mapgl';
 import type { Map as MapGLMap } from '@2gis/mapgl/types';
 import { useEffect, useRef, useState } from 'react';
 import type { WashLocation } from '../api/contracts';
+import { getQueueLoadLevel, type QueueLoadLevel } from '../utils/queueLoadLevel';
 
 type MapGLApi = Awaited<ReturnType<typeof load>>;
 
 const saintPetersburgCenter = [30.3141, 59.9386];
 const cityZoom = 10.2;
+
+const queueLoadMarkerColors: Record<QueueLoadLevel, string> = {
+    Free: '#16a34a',
+    Moderate: '#d97706',
+    Busy: '#dc2626',
+};
 
 interface WashLocationsMapProps {
     locations: WashLocation[];
@@ -14,6 +21,13 @@ interface WashLocationsMapProps {
 }
 
 export function WashLocationsMap({ locations, onLocationSelected }: WashLocationsMapProps) {
+    // navigate из react-router меняет идентичность на каждой навигации, поэтому обработчик держим в ref:
+    // иначе эффект маркеров перезапускался бы на каждый переход и пересоздавал все точки на карте.
+    const onLocationSelectedRef = useRef(onLocationSelected);
+    useEffect(() => {
+        onLocationSelectedRef.current = onLocationSelected;
+    });
+
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<MapGLMap | null>(null);
     const mapglApiRef = useRef<MapGLApi | null>(null);
@@ -25,6 +39,7 @@ export function WashLocationsMap({ locations, onLocationSelected }: WashLocation
             return;
         }
 
+        let createdMap: MapGLMap | undefined;
         let mapDisposed = false;
 
         load()
@@ -34,21 +49,23 @@ export function WashLocationsMap({ locations, onLocationSelected }: WashLocation
                     return;
                 }
 
-                mapglApiRef.current = mapglApi;
-                mapRef.current = new mapglApi.Map(mapContainerRef.current, {
+                const map = new mapglApi.Map(mapContainerRef.current, {
                     key: mapKey,
                     center: saintPetersburgCenter,
                     zoom: cityZoom,
                     zoomControl: false,
                     lang: 'ru', // без явного языка MapGL подписывает город и пригороды латиницей
                 });
+                createdMap = map;
+                mapglApiRef.current = mapglApi;
+                mapRef.current = map;
                 setIsMapReady(true);
             })
             .catch(error => console.error('MapGL не загрузился, карта показана не будет', error));
 
         return () => {
             mapDisposed = true;
-            mapRef.current?.destroy();
+            createdMap?.destroy();
             mapRef.current = null;
             setIsMapReady(false);
         };
@@ -64,10 +81,14 @@ export function WashLocationsMap({ locations, onLocationSelected }: WashLocation
         }
 
         const markers = locations.map(washLocation => {
-            const marker = new mapglApi.Marker(map, {
+            const marker = new mapglApi.CircleMarker(map, {
                 coordinates: [washLocation.longitude, washLocation.latitude],
+                color: queueLoadMarkerColors[getQueueLoadLevel(washLocation.carsInQueue)],
+                diameter: 22,
+                strokeColor: '#ffffff',
+                strokeWidth: 3,
             });
-            marker.on('click', () => onLocationSelected(washLocation.id));
+            marker.on('click', () => onLocationSelectedRef.current(washLocation.id));
             return marker;
         });
 
@@ -77,7 +98,7 @@ export function WashLocationsMap({ locations, onLocationSelected }: WashLocation
                 markers.forEach(marker => marker.destroy());
             }
         };
-    }, [isMapReady, locations, onLocationSelected]);
+    }, [isMapReady, locations]);
 
     if (!mapKey) {
         return (
