@@ -15,7 +15,7 @@ src/RoboWash.Api/         net10.0 — Controllers, Services, Data (DbContext, en
 src/RoboWash.xUnit/       unit and integration tests
 src/robo-wash-react/      React + TypeScript (Vite), opened separately in VS Code
   src/api/                HTTP client + DTO types mirroring the API contracts
-  src/pages/              LocationPage, WashSessionPage, HistoryPage — routed screens drawn over the map
+  src/pages/              LocationPage, TerminalPage, WashSessionPage, HistoryPage — screens drawn over the map
   src/components/         shared UI
   src/hooks/              useDeviceId and friends
   src/utils/              pure helpers (no I/O, no React)
