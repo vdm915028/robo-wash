@@ -90,7 +90,9 @@ The bar for a remark is high. Raise only two kinds of thing:
 - something that actually breaks, leaks, or opens a security hole;
 - a direct violation of a rule written in this file.
 
-Everything else stays unsaid. No style nitpicks, no speculation, no "this could also be done differently".
+Everything else stays unsaid. No style nitpicks, no speculation, no "this could also be done differently". A
+finding you could not verify is not a finding: when the dependencies, toolchain or data needed to check it are
+out of reach, say nothing — a caveat does not turn a guess into a remark worth making.
 The simplifications listed in README ("Что намеренно не делаем") are deliberate and are never findings. Never
 raise: missing tests, missing interfaces or abstraction layers, a state-management library, JSDoc or XML docs,
 error handling beyond what a demo needs, a different library or stack, linter and formatter setup.

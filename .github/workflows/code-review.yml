@@ -24,11 +24,20 @@ jobs:
         with:
           fetch-depth: 0 # ревью идёт по диффу с базовой веткой, одного последнего коммита для этого мало
 
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: src/robo-wash-react/package-lock.json
+
+      # Типы проверяет компилятор, а не агент: npm run build — это tsc --noEmit плюс сборка Vite.
+      - name: Build client
+        working-directory: src/robo-wash-react
+        run: npm ci && npm run build
+
       - uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          # ВРЕМЕННО: без этого флага экшен прячет текст ошибки Claude, в логе виден только is_error.
-          show_full_output: "true"
           # Без track_progress экшен не заводит в PR свой комментарий, и итоговый вердикт писать некуда.
           track_progress: "true"
           prompt: |
