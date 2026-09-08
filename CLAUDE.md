@@ -84,7 +84,11 @@ cannot be wrapped — a CLI argument list in YAML, a long URL — is not a findi
 
 ## Code review agent
 
-Reviews every pull request (`.github/workflows/code-review.yml`) and, before a commit, the working tree locally.
+Reviews every pull request (`.github/workflows/code-review.yml`), and runs locally once per branch — over the
+whole diff against `main`, right before the pull request is opened. Not per commit: a commit can be a fragment,
+a pull request is a finished feature, and a defect caught before it is never pushed at all. The pull request
+agent reads this file from `main` and skips pull requests that change its own workflow — two blind spots the
+local run covers.
 
 The bar for a remark is high. Raise only two kinds of thing:
 - something that actually breaks, leaks, or opens a security hole;
