@@ -1,6 +1,9 @@
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { hardcodedWashLocations } from './api/hardcodedWashLocations';
+import { AppMenu } from './components/AppMenu';
 import { WashLocationsMap } from './components/WashLocationsMap';
+import { AboutPage } from './pages/AboutPage';
+import { HistoryPage } from './pages/HistoryPage';
 import { LocationPage } from './pages/LocationPage';
 import { TerminalPage } from './pages/TerminalPage';
 import { WashSessionPage } from './pages/WashSessionPage';
@@ -16,8 +19,12 @@ export function App() {
                 locations={hardcodedWashLocations}
                 onLocationSelected={locationId => navigate(`/locations/${locationId}`)}
             />
+            {/* Меню объявлено до маршрутов, поэтому полноэкранные экраны перекрывают его сами, без условий. */}
+            <AppMenu />
             <Routes>
                 <Route path="/" element={null} />
+                <Route path="/history" element={<HistoryPage />} />
+                <Route path="/about" element={<AboutPage />} />
                 <Route path="/locations/:locationId" element={<LocationPage />} />
                 <Route path="/locations/:locationId/terminal" element={<TerminalPage />} />
                 <Route path="/locations/:locationId/wash/:washModeId" element={<WashSessionPage />} />
