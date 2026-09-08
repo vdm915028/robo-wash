@@ -97,6 +97,9 @@ The bar for a remark is high. Raise only two kinds of thing:
 Everything else stays unsaid. No style nitpicks, no speculation, no "this could also be done differently". A
 finding you could not verify is not a finding: when the dependencies, toolchain or data needed to check it are
 out of reach, say nothing — a caveat does not turn a guess into a remark worth making.
+Check what you can with the toolchain — the installed typings, `tsc --noEmit`, a build, a grep. Never start the
+app or drive it in a browser: that check runs separately, once, at the end of the client work and over a short
+list of cases, because it costs far more time than it returns on a single branch.
 The simplifications listed in README ("Что намеренно не делаем") are deliberate and are never findings. Never
 raise: missing tests, missing interfaces or abstraction layers, a state-management library, JSDoc or XML docs,
 error handling beyond what a demo needs, a different library or stack, linter and formatter setup.
