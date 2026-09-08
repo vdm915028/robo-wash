@@ -14,22 +14,26 @@ export function App() {
     const navigate = useNavigate();
 
     return (
-        <div className="relative h-dvh w-full overflow-hidden">
-            <WashLocationsMap
-                locations={hardcodedWashLocations}
-                onLocationSelected={locationId => navigate(`/locations/${locationId}`)}
-            />
-            {/* Меню объявлено до маршрутов, поэтому полноэкранные экраны перекрывают его сами, без условий. */}
-            <AppMenu />
-            <Routes>
-                <Route path="/" element={null} />
-                <Route path="/history" element={<HistoryPage />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/locations/:locationId" element={<LocationPage />} />
-                <Route path="/locations/:locationId/terminal" element={<TerminalPage />} />
-                <Route path="/locations/:locationId/wash/:washModeId" element={<WashSessionPage />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+        // Приложение мобильное, поэтому на широком экране колонка ограничена шириной телефона, а поля по бокам
+        // подстраиваются под цветовую схему системы: так демо на ноутбуке выглядит как телефон, а не растягивается.
+        <div className="flex h-dvh w-full justify-center bg-white dark:bg-black">
+            <div className="relative h-full w-full max-w-md overflow-hidden">
+                <WashLocationsMap
+                    locations={hardcodedWashLocations}
+                    onLocationSelected={locationId => navigate(`/locations/${locationId}`)}
+                />
+                {/* Меню объявлено до маршрутов, поэтому полноэкранные экраны перекрывают его сами, без условий. */}
+                <AppMenu />
+                <Routes>
+                    <Route path="/" element={null} />
+                    <Route path="/history" element={<HistoryPage />} />
+                    <Route path="/about" element={<AboutPage />} />
+                    <Route path="/locations/:locationId" element={<LocationPage />} />
+                    <Route path="/locations/:locationId/terminal" element={<TerminalPage />} />
+                    <Route path="/locations/:locationId/wash/:washModeId" element={<WashSessionPage />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+            </div>
         </div>
     );
 }
