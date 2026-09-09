@@ -1,6 +1,7 @@
 import { FullScreenHeader } from '../components/FullScreenHeader';
 
 const githubProjectUrl = 'https://github.com/vdm915028/robo-wash';
+const conversationLogUrl = 'https://storage.googleapis.com/robo-wash-bucket/conversation-log.html';
 const linkCardClasses = 'block rounded-2xl bg-white p-4 shadow-sm';
 
 const projectShowcasePoints = [
@@ -41,15 +42,24 @@ export function AboutPage() {
 
                 <div className="mt-4 space-y-2">
                     <a href={githubProjectUrl} target="_blank" rel="noreferrer" className={linkCardClasses}>
-                        <p className="font-medium text-slate-900">Исходный код</p>
-                        <p className="mt-0.5 text-sm text-slate-500">github.com/vdm915028/robo-wash</p>
+                        <div className="flex items-center justify-between gap-3">
+                            <div>
+                                <p className="text-brand font-medium">Исходный код</p>
+                                <p className="mt-0.5 text-sm text-slate-500">github.com/vdm915028/robo-wash</p>
+                            </div>
+                            <span aria-hidden="true" className="text-brand shrink-0 text-lg">↗</span>
+                        </div>
                     </a>
 
-                    {/* Переписка с агентом — отдельная статичная страница, её ещё нет; ссылка появится вместе с ней. */}
-                    <div className={linkCardClasses}>
-                        <p className="font-medium text-slate-400">Переписка с агентом</p>
-                        <p className="mt-0.5 text-sm text-slate-400">Скоро</p>
-                    </div>
+                    <a href={conversationLogUrl} target="_blank" rel="noreferrer" className={linkCardClasses}>
+                        <div className="flex items-center justify-between gap-3">
+                            <div>
+                                <p className="text-brand font-medium">Переписка с агентом</p>
+                                <p className="mt-0.5 text-sm text-slate-500">От постановки задачи до публикации</p>
+                            </div>
+                            <span aria-hidden="true" className="text-brand shrink-0 text-lg">↗</span>
+                        </div>
+                    </a>
                 </div>
             </div>
         </section>
