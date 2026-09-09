@@ -55,7 +55,7 @@ src/RoboWash.Api/         контроллеры, сервисы, EF Core (DbCon
 src/RoboWash.xUnit/       юнит- и интеграционные тесты
 src/robo-wash-react/      клиент, открывается отдельно в VS Code
 .github/workflows/        CI (тесты + агент код-ревью) и CD (деплой в Cloud Run)
-Dockerfile                собирает клиент и отдаёт его из API
+Dockerfile                собирает клиент в статику, отдаёт её nginx (deploy/nginx.conf.template)
 CLAUDE.md                 правила для Claude-агентов: структура, код-стайл, workflow
 ```
 

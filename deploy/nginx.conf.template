@@ -1,0 +1,21 @@
+server {
+    listen ${PORT};
+    server_name _;
+    root /usr/share/nginx/html;
+
+    # Маршруты вроде /history и /about существуют только в роутере: статике отдавать по ним нечего,
+    # поэтому всё, что не нашлось файлом, возвращает index.html и разбирается уже на клиенте.
+    location / {
+        try_files $uri /index.html;
+    }
+
+    # Имена ассетов содержат хеш сборки, поэтому их можно кэшировать надолго.
+    location /assets/ {
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    # А сам index.html — нельзя: иначе после деплоя браузер продолжит грузить старую сборку.
+    location = /index.html {
+        add_header Cache-Control "no-store";
+    }
+}
