@@ -20,7 +20,7 @@ src/robo-wash-react/      React + TypeScript (Vite), opened separately in VS Cod
   src/hooks/              useDeviceId and friends
   src/utils/              pure helpers (no I/O, no React)
 .github/workflows/        CI (tests + review agent) and CD (Cloud Run)
-Dockerfile                builds the client, serves it from the API
+Dockerfile                builds the client into a static bundle, nginx serves it (deploy/nginx.conf.template)
 ```
 
 ## Language
