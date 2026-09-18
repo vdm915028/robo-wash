@@ -49,6 +49,8 @@ Code, identifiers and file names — English. UI strings — Russian. Comments m
 - Async all the way for I/O, `CancellationToken` from the action down to the EF Core call.
 - Entities and properties stay PascalCase, tables and columns in Postgres are snake_case: quoted identifiers turn
   every hand-written query into a chore. The mapping is configured once globally, never per property.
+- Constraints in the schema only where the application needs one. A unique index on a natural-looking key blocks
+  archiving later: a retired location and the one replacing it legitimately share an address.
 
 ## React / TypeScript
 
