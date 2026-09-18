@@ -19,6 +19,7 @@ src/robo-wash-react/      React + TypeScript (Vite), opened separately in VS Cod
   src/components/         shared UI
   src/hooks/              useDeviceId and friends
   src/utils/              pure helpers (no I/O, no React)
+db/                       SQL script that creates the database from scratch: tables, then reference data
 .github/workflows/        CI (tests + review agent) and CD (Cloud Run)
 Dockerfile                builds the client into a static bundle, nginx serves it (deploy/nginx.conf.template)
 ```
@@ -46,6 +47,10 @@ Code, identifiers and file names — English. UI strings — Russian. Comments m
   name — that duplicates naming and hides where the logic lives. Request shaping, validation and response mapping
   belong in the action; reusable domain and data work belongs in a service.
 - Async all the way for I/O, `CancellationToken` from the action down to the EF Core call.
+- Entities and properties stay PascalCase, tables and columns in Postgres are snake_case: quoted identifiers turn
+  every hand-written query into a chore. The mapping is configured once globally, never per property.
+- Constraints in the schema only where the application needs one. A unique index on a natural-looking key blocks
+  archiving later: a retired location and the one replacing it legitimately share an address.
 
 ## React / TypeScript
 
