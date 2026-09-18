@@ -10,7 +10,7 @@ client-side countdown), no bonuses.
 ## Repository layout
 
 ```
-RoboWash.sln              solution — Api and xUnit only, the client is not part of it
+RoboWash.slnx             solution — Api and xUnit only, the client is not part of it
 src/RoboWash.Api/         net10.0 — Controllers, Services, Data (DbContext, entities, migrations), Contracts
 src/RoboWash.xUnit/       unit and integration tests
 src/robo-wash-react/      React + TypeScript (Vite), opened separately in VS Code

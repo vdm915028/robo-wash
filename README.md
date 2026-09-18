@@ -72,7 +72,7 @@
 ## Структура репозитория
 
 ```
-RoboWash.sln              солюшн Visual Studio: Api и xUnit, клиент в него не входит
+RoboWash.slnx             солюшн: Api и xUnit, клиент в него не входит
 src/RoboWash.Api/         контроллеры, сервисы, EF Core (DbContext, сущности, миграции), контракты
 src/RoboWash.xUnit/       юнит- и интеграционные тесты
 src/robo-wash-react/      клиент, открывается отдельно в VS Code
@@ -109,7 +109,7 @@ npm --prefix src/robo-wash-react run dev
 Тесты:
 
 ```bash
-dotnet test RoboWash.sln
+dotnet test RoboWash.slnx
 ```
 
 Весь образ целиком:
