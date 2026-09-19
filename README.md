@@ -98,7 +98,7 @@ psql -U postgres -f db/create-database.sql
 пользователем `postgres`. Если пароль у вас другой, переопределите её переменной окружения
 `ConnectionStrings__RoboWash`, а файл в репозитории не трогайте.
 
-API (`https://localhost:7001`, Swagger на `/swagger`):
+API (`https://localhost:7228`, описание OpenAPI на `/openapi/v1.json`):
 
 ```bash
 dotnet run --project src/RoboWash.Api
