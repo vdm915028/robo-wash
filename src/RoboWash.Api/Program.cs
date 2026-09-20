@@ -29,3 +29,7 @@ if (app.Environment.IsDevelopment())
 app.MapControllers();
 
 app.Run();
+
+// WebApplicationFactory в интеграционных тестах поднимает приложение по типу точки входа, а у файла
+// с операторами верхнего уровня класс Program генерируется internal. Объявление открывает его тестам.
+public partial class Program;
