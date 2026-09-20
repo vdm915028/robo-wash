@@ -10,11 +10,12 @@ client-side countdown), no bonuses.
 ## Repository layout
 
 ```
-RoboWash.sln              solution — Api and xUnit only, the client is not part of it
-src/RoboWash.Api/         net10.0 — Controllers, Services, Data (DbContext, entities, migrations), Contracts
-src/RoboWash.xUnit/       unit and integration tests
+RoboWash.slnx             solution — Api and xUnit only, the client is not part of it
+src/RoboWash.Api/         net10.0 — Controllers, Services (+ Models), Data (DbContext, entities), Contracts, Enums
+src/RoboWash.xUnit/       integration tests: the API over a throwaway Postgres in a container
 src/robo-wash-react/      React + TypeScript (Vite), opened separately in VS Code
   src/api/                HTTP client + DTO types mirroring the API contracts
+  src/context/            providers holding data several screens share
   src/pages/              LocationPage, TerminalPage, WashSessionPage, HistoryPage — screens drawn over the map
   src/components/         shared UI
   src/hooks/              useDeviceId and friends
@@ -51,6 +52,16 @@ Code, identifiers and file names — English. UI strings — Russian. Comments m
   every hand-written query into a chore. The mapping is configured once globally, never per property.
 - Constraints in the schema only where the application needs one. A unique index on a natural-looking key blocks
   archiving later: a retired location and the one replacing it legitimately share an address.
+- DTOs and service result models are records with init-only properties, never positional records, and they are
+  built with object initializers. Every value is then labelled at the call site: reordering two properties of the
+  same type cannot silently swap them, and the compiler still catches a missing `required` one.
+- Enums live in `Enums/`, shared by entities and contracts alike. `Contracts` never references `Data` — the shape
+  that goes over the wire must not depend on how rows are stored.
+- One type per file, in a folder that names its role: a service's result model belongs in `Services/Models/`,
+  not beside the service that returns it.
+- LINQ lambda parameters are single letters (`l`, `m`) — they live for one line. Type and method names stay long
+  and precise. Public methods hand back `IReadOnlyList<T>`, not `List<T>`, and a one-line condition goes inline
+  instead of into a private helper.
 
 ## React / TypeScript
 

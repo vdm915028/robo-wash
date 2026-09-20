@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
-import { findWashLocationById } from '../api/hardcodedWashLocations';
+import { useWashLocationById } from '../context/WashLocationsContext';
 
 const washModeButtonBaseClasses = 'flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left';
 const payButtonClasses =
@@ -9,8 +9,14 @@ const payButtonClasses =
 export function TerminalPage() {
     const { locationId } = useParams();
     const navigate = useNavigate();
-    const washLocation = findWashLocationById(Number(locationId));
+    const { washLocation, isLoading } = useWashLocationById(locationId);
     const [selectedWashModeId, setSelectedWashModeId] = useState<number | null>(null);
+
+    // Пока справочник едет, показывать нечего, но и уводить с экрана нельзя: по прямой ссылке
+    // пользователь улетел бы на карту ещё до того, как выяснится, есть такая локация или нет.
+    if (isLoading) {
+        return null;
+    }
 
     if (!washLocation) {
         return <Navigate to="/" replace />;
