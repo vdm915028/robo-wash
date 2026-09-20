@@ -22,7 +22,7 @@ src/robo-wash-react/      React + TypeScript (Vite), opened separately in VS Cod
   src/hooks/              useDeviceId and friends
   src/utils/              pure helpers (no I/O, no React)
 db/                       SQL script that creates the database from scratch: tables, then reference data
-.github/workflows/        CI (client build + review agent) and CD (both Cloud Run services)
+.github/workflows/        CI (tests, client build, review agent) and CD (tests, then both Cloud Run services)
 ```
 
 ## Language
