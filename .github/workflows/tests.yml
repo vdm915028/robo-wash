@@ -1,0 +1,33 @@
+name: Tests
+
+# Два входа у одного файла: на pull request тесты идут своим прогоном, параллельно агенту код-ревью,
+# а деплой вызывает этот же workflow первым job'ом. Копии определения нет, значит и разойтись нечему.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_call:
+
+# На pull request промежуточные пуши отменяем — проверяем последнее состояние ветки. В деплое группа
+# уникальна по номеру прогона, и отменять там нечего: выкатка не должна остаться без тестов.
+concurrency:
+  group: tests-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      # Версию SDK закрепляем здесь: global.json в репозитории нет, а предустановленный на раннере
+      # .NET меняется без нашего участия.
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+
+      # Интеграционные тесты поднимают Postgres через Testcontainers — на ubuntu-раннере Docker уже есть.
+      - name: Run tests
+        run: dotnet test RoboWash.slnx
