@@ -11,9 +11,10 @@ client-side countdown), no bonuses.
 
 ```
 RoboWash.slnx             solution — Api and xUnit only, the client is not part of it
-src/RoboWash.Api/         net10.0 — Controllers, Services (+ Models), Data (DbContext, entities), Contracts, Enums
+src/RoboWash.Api/         net10.0 — Controllers, Services (+ Models), Data (DbContext, entities), Contracts,
+                          Enums, and the Dockerfile that builds its image
 src/RoboWash.xUnit/       integration tests: the API over a throwaway Postgres in a container
-src/robo-wash-react/      React + TypeScript (Vite), opened separately in VS Code
+src/robo-wash-react/      React + TypeScript (Vite), opened separately in VS Code; Dockerfile and nginx template
   src/api/                HTTP client + DTO types mirroring the API contracts
   src/context/            providers holding data several screens share
   src/pages/              LocationPage, TerminalPage, WashSessionPage, HistoryPage — screens drawn over the map
@@ -21,8 +22,7 @@ src/robo-wash-react/      React + TypeScript (Vite), opened separately in VS Cod
   src/hooks/              useDeviceId and friends
   src/utils/              pure helpers (no I/O, no React)
 db/                       SQL script that creates the database from scratch: tables, then reference data
-.github/workflows/        CI (tests + review agent) and CD (Cloud Run)
-Dockerfile                builds the client into a static bundle, nginx serves it (deploy/nginx.conf.template)
+.github/workflows/        CI (client build + review agent) and CD (both Cloud Run services)
 ```
 
 ## Language
@@ -71,6 +71,10 @@ Code, identifiers and file names — English. UI strings — Russian. Comments m
 - Styling is Tailwind. Class names must be literal strings — the scanner never sees `bg-${level}-100`, so map a
   value to whole class names instead.
 - Keep the API surface in `src/api`; components never call `fetch` directly.
+- The client and the API are separate Cloud Run services, so the client calls the API by absolute address from
+  `VITE_API_BASE_URL`. Vite substitutes `VITE_*` while building, so that address arrives as a
+  `docker build --build-arg`: a container environment variable never reaches a bundle that is already built.
+  Locally the variable stays empty, the path stays relative, and the Vite proxy forwards it to the API.
 - The map is 2GIS MapGL (`@2gis/mapgl`), which is imperative and has no React wrapper: create the map in an
   effect against a container ref, destroy it on unmount, and keep every marker call inside the map component so
   the instance never leaks into the rest of the tree. Markers belong in their own effect — data changes must

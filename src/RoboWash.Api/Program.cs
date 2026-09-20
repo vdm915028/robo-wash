@@ -13,6 +13,13 @@ builder.Services
 
 builder.Services.AddOpenApi();
 
+// Клиент развёрнут отдельным сервисом Cloud Run и приходит с чужого origin, поэтому браузер без
+// разрешения не отдаст ему ответ. Мобильные клиенты этой проверки не делают — CORS живёт в браузере.
+builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy
+    .WithOrigins(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [])
+    .AllowAnyHeader()
+    .AllowAnyMethod()));
+
 builder.Services.AddDbContext<RoboWashDbContext>(options => options
     .UseNpgsql(builder.Configuration.GetConnectionString("RoboWash"))
     .UseSnakeCaseNamingConvention());
@@ -25,6 +32,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseCors();
 
 app.MapControllers();
 
