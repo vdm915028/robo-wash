@@ -12,9 +12,10 @@ client-side countdown), no bonuses.
 ```
 RoboWash.slnx             solution — Api and xUnit only, the client is not part of it
 src/RoboWash.Api/         net10.0 — Controllers, Services (+ Models), Data (DbContext, entities), Contracts, Enums
-src/RoboWash.xUnit/       unit and integration tests
+src/RoboWash.xUnit/       integration tests: the API over a throwaway Postgres in a container
 src/robo-wash-react/      React + TypeScript (Vite), opened separately in VS Code
   src/api/                HTTP client + DTO types mirroring the API contracts
+  src/context/            providers holding data several screens share
   src/pages/              LocationPage, TerminalPage, WashSessionPage, HistoryPage — screens drawn over the map
   src/components/         shared UI
   src/hooks/              useDeviceId and friends

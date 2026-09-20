@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { findWashLocationById } from '../api/hardcodedWashLocations';
+import { useWashLocationById } from '../context/WashLocationsContext';
 import { pluralizeRussian } from '../utils/pluralizeRussian';
 
 const washDurationSeconds = 5;
@@ -11,20 +11,22 @@ const washScreenClasses = 'absolute inset-0 flex flex-col items-center justify-c
 export function WashSessionPage() {
     const { locationId, washModeId } = useParams();
     const navigate = useNavigate();
-    const washLocation = findWashLocationById(Number(locationId));
+    const { washLocation, isLoading } = useWashLocationById(locationId);
     const washMode = washLocation?.washModes.find(mode => mode.id === Number(washModeId));
     const [secondsLeft, setSecondsLeft] = useState(washDurationSeconds);
     const isWashCompleted = secondsLeft === 0;
 
     // Демо-упрощение: в боевой системе о ходе мойки сообщает оборудование, здесь это отсчёт на клиенте.
     useEffect(() => {
-        if (isWashCompleted) {
+        // По прямой ссылке экран открывается раньше, чем приедет справочник: начатый отсчёт
+        // показал бы пользователю уже подтаявший таймер мойки, за которую он заплатил.
+        if (isLoading || isWashCompleted) {
             return;
         }
 
         const countdown = setInterval(() => setSecondsLeft(seconds => Math.max(0, seconds - 1)), 1000);
         return () => clearInterval(countdown);
-    }, [isWashCompleted]);
+    }, [isLoading, isWashCompleted]);
 
     useEffect(() => {
         if (!isWashCompleted) {
@@ -34,6 +36,12 @@ export function WashSessionPage() {
         const returnToMap = setTimeout(() => navigate('/', { replace: true }), washCompletedScreenSeconds * 1000);
         return () => clearTimeout(returnToMap);
     }, [isWashCompleted, navigate]);
+
+    // Пока справочник едет, показывать нечего, но и уводить с экрана нельзя: по прямой ссылке
+    // пользователь улетел бы на карту ещё до того, как выяснится, есть такая локация или нет.
+    if (isLoading) {
+        return null;
+    }
 
     if (!washLocation || !washMode) {
         return <Navigate to="/" replace />;

@@ -1,6 +1,6 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { findWashLocationById } from '../api/hardcodedWashLocations';
 import { WashModeList } from '../components/WashModeList';
+import { useWashLocationById } from '../context/WashLocationsContext';
 import { pluralizeRussian } from '../utils/pluralizeRussian';
 import { getQueueLoadLevel, type QueueLoadLevel } from '../utils/queueLoadLevel';
 
@@ -12,7 +12,13 @@ const queueLoadBadgeClasses: Record<QueueLoadLevel, string> = {
 
 export function LocationPage() {
     const { locationId } = useParams();
-    const washLocation = findWashLocationById(Number(locationId));
+    const { washLocation, isLoading } = useWashLocationById(locationId);
+
+    // Пока справочник едет, показывать нечего, но и уводить с экрана нельзя: по прямой ссылке
+    // пользователь улетел бы на карту ещё до того, как выяснится, есть такая локация или нет.
+    if (isLoading) {
+        return null;
+    }
 
     if (!washLocation) {
         return <Navigate to="/" replace />;
