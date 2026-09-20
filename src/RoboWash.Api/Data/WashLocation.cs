@@ -1,3 +1,5 @@
+using RoboWash.Api.Enums;
+
 namespace RoboWash.Api.Data;
 
 public class WashLocation

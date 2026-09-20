@@ -1,4 +1,4 @@
-namespace RoboWash.Api.Data;
+namespace RoboWash.Api.Enums;
 
 public enum RobotEquipmentGeneration
 {

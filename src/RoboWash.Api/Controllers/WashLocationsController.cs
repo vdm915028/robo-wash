@@ -13,23 +13,23 @@ public class WashLocationsController(WashLocationService washLocationService) : 
     {
         var locations = await washLocationService.GetLocationsWithAvailableModesAsync(cancellationToken);
 
-        return locations
-            .Select(entry => new WashLocationResponse(
-                entry.Location.Id,
-                entry.Location.Address,
-                entry.Location.Longitude,
-                entry.Location.Latitude,
-                entry.Location.RobotEquipmentGeneration,
-                entry.Location.CarsInQueue,
-                entry.AvailableModes
-                    .Select(mode => new WashModeResponse(
-                        mode.Id,
-                        mode.Name,
-                        mode.PriceRub,
-                        mode.DurationMinutes,
-                        mode.Description,
-                        mode.Steps))
-                    .ToList()))
-            .ToList();
+        return locations.Select(l => new WashLocationResponse
+        {
+            Id = l.Location.Id,
+            Address = l.Location.Address,
+            Longitude = l.Location.Longitude,
+            Latitude = l.Location.Latitude,
+            RobotEquipmentGeneration = l.Location.RobotEquipmentGeneration,
+            CarsInQueue = l.Location.CarsInQueue,
+            WashModes = l.AvailableModes.Select(m => new WashModeResponse
+            {
+                Id = m.Id,
+                Name = m.Name,
+                PriceRub = m.PriceRub,
+                DurationMinutes = m.DurationMinutes,
+                Description = m.Description,
+                Steps = m.Steps
+            }).ToList()
+        }).ToList();
     }
 }

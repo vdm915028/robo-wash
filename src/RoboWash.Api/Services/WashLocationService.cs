@@ -1,27 +1,23 @@
 using Microsoft.EntityFrameworkCore;
 using RoboWash.Api.Data;
+using RoboWash.Api.Enums;
+using RoboWash.Api.Services.Models;
 
 namespace RoboWash.Api.Services;
 
-public record WashLocationWithModes(WashLocation Location, IReadOnlyList<WashMode> AvailableModes);
-
 public class WashLocationService(RoboWashDbContext db)
 {
-    public async Task<List<WashLocationWithModes>> GetLocationsWithAvailableModesAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<WashLocationWithModes>> GetLocationsWithAvailableModesAsync(CancellationToken cancellationToken)
     {
-        var locations = await db.WashLocations.OrderBy(location => location.Id).ToListAsync(cancellationToken);
-        var allModes = await db.WashModes.OrderBy(mode => mode.Id).ToListAsync(cancellationToken);
+        var locations = await db.WashLocations.OrderBy(l => l.Id).ToListAsync(cancellationToken);
+        var allModes = await db.WashModes.OrderBy(m => m.Id).ToListAsync(cancellationToken);
 
-        return locations
-            .Select(location => new WashLocationWithModes(location, SelectAvailableModes(location, allModes)))
-            .ToList();
-    }
-
-    // Режимов на всю сеть единицы, поэтому подбираем в памяти: запрос на каждую точку дал бы N+1 ради трёх строк.
-    static List<WashMode> SelectAvailableModes(WashLocation location, List<WashMode> allModes)
-    {
-        var hasModernRobots = location.RobotEquipmentGeneration == RobotEquipmentGeneration.Modern;
-
-        return allModes.Where(mode => hasModernRobots || !mode.RequiresModernEquipment).ToList();
+        return locations.Select(l => new WashLocationWithModes
+        {
+            Location = l,
+            AvailableModes = l.RobotEquipmentGeneration == RobotEquipmentGeneration.Modern
+                ? allModes
+                : allModes.Where(m => !m.RequiresModernEquipment).ToList()
+        }).ToList();
     }
 }
