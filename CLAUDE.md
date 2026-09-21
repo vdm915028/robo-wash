@@ -123,6 +123,9 @@ characters past the limit stays on one line; it is wrapped only when it is well 
 
 - Never `git commit`, `git push` or open a pull request. The user does that. Leave the working tree review-ready.
 - One feature branch per feature.
+- Tests ship with the code in the same pull request: a branch that adds or changes API behaviour adds the
+  integration tests that pin it down. A pull request is a finished feature, and behaviour nobody has pinned down is
+  not finished. The client has no tests for now by decision — the focus is the backend.
 - Packages are approved before they are installed (npm and NuGet alike): list every package with vendor, version
   and what it is needed for, wait for the user's go-ahead, then run the install yourself. This project rule wins
   over any standing "never install" preference.
@@ -148,8 +151,11 @@ Check what you can with the toolchain — the installed typings, `tsc --noEmit`,
 app or drive it in a browser: that check runs separately, once, at the end of the client work and over a short
 list of cases, because it costs far more time than it returns on a single branch.
 The simplifications listed in README ("Что намеренно не делаем") are deliberate and are never findings. Never
-raise: missing tests, missing interfaces or abstraction layers, a state-management library, JSDoc or XML docs,
-error handling beyond what a demo needs, a different library or stack, linter and formatter setup.
+raise: missing interfaces or abstraction layers, a state-management library, JSDoc or XML docs, error handling
+beyond what a demo needs, a different library or stack, linter and formatter setup.
+Tests are raised one way only: API behaviour added or changed in the pull request that no test covers at all —
+that breaks the rule in Workflow. The depth of coverage (one more edge case, one more assertion) is never a
+finding, and neither are client tests: the client has none for now by decision.
 
 Findings land on the pull request as inline comments on the lines they concern. Every run ends with one summary
 comment: whether the changes match the pull request title and description, what was found, and whether it can be
