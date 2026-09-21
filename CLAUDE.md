@@ -53,6 +53,10 @@ Code, identifiers and file names — English. UI strings — Russian. Comments m
   way an analyzer suggests.
 - An `if` whose body is a single statement drops the braces and puts the statement on the next line. Braces come
   back once the body grows past one statement.
+- Controller actions always have a block body, never `=>`: an expression-bodied action reads badly and leaves no
+  line of its own for a breakpoint. Extension methods and other one-expression helpers keep `=>`.
+- When the declaration already names the type — a return type, a field — `new()` is enough:
+  `WashSessionResponse ToResponse(...) => new() { ... }`. With `var`, the type stays after `new`.
 - Controllers are not thin pass-throughs: an action must not reduce to `return _xService.X(...)` under the same
   name — that duplicates naming and hides where the logic lives. Request shaping, validation and response mapping
   belong in the action; reusable domain and data work belongs in a service. The one exception is a list, see below:
@@ -112,7 +116,8 @@ session are explained once, on the entity, not at every place that fills them.
 ## Formatting
 
 Lines up to ~125 chars. Don't break short statements across lines. The limit is about code: a config value that
-cannot be wrapped — a CLI argument list in YAML, a long URL — is not a finding.
+cannot be wrapped — a CLI argument list in YAML, a long URL — is not a finding. A method signature that runs a few
+characters past the limit stays on one line; it is wrapped only when it is well past.
 
 ## Workflow
 
