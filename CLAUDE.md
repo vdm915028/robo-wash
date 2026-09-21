@@ -51,9 +51,19 @@ Code, identifiers and file names — English. UI strings — Russian. Comments m
   A pure helper that belongs to no single type goes to `Utils/`.
 - Skip ceremony modifiers (`sealed`, blanket `readonly`, `[Pure]`) — write it the way a developer would, not the
   way an analyzer suggests.
+- An `if` whose body is a single statement drops the braces and puts the statement on the next line. Braces come
+  back once the body grows past one statement.
 - Controllers are not thin pass-throughs: an action must not reduce to `return _xService.X(...)` under the same
   name — that duplicates naming and hides where the logic lives. Request shaping, validation and response mapping
-  belong in the action; reusable domain and data work belongs in a service.
+  belong in the action; reusable domain and data work belongs in a service. The one exception is a list, see below:
+  its projection is data work, so the service already returns the contract and the action hands it back as is.
+- Mapping one entity to its response is an extension method in `Extensions/` — `washSession.ToResponse()` — and
+  the action stays a readable sequence of steps. A list never goes through it: the query projects straight into
+  the contract with `Select(s => new XResponse { ... })`, so only the listed columns leave the database and nothing
+  is tracked. `ToResponse()` inside that query would make EF load whole rows just to call it. A list usually shows
+  far fewer fields than a detail view (a catalogue row is a name, a price and a picture; the product page adds the
+  description and the specs) — then the list gets its own `XListItemResponse`. While the two shapes match, one
+  contract serves both.
 - Async all the way for I/O, `CancellationToken` from the action down to the EF Core call.
 - Entities and properties stay PascalCase, tables and columns in Postgres are snake_case: quoted identifiers turn
   every hand-written query into a chore. The mapping is configured once globally, never per property.

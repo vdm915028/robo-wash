@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RoboWash.Api.Contracts;
+using RoboWash.Api.Extensions;
 using RoboWash.Api.Services;
 
 namespace RoboWash.Api.Controllers;
@@ -21,13 +22,13 @@ public class WashSessionsController(WashSessionService washSessionService) : Con
         if (washSession is null)
             return Problem("Такого режима мойки на этой локации нет.", statusCode: StatusCodes.Status400BadRequest);
 
-        return new WashSessionResponse
-        {
-            Id = washSession.Id,
-            LocationAddress = washSession.LocationAddress,
-            WashModeName = washSession.WashModeName,
-            PriceRub = washSession.PriceRub,
-            WashedAt = washSession.WashedAt,
-        };
+        return washSession.ToResponse();
+    }
+
+    [HttpGet]
+    public Task<IReadOnlyList<WashSessionResponse>> GetHistory([FromHeader(Name = DeviceIdHeader)] string deviceId,
+        CancellationToken cancellationToken)
+    {
+        return washSessionService.GetWashHistoryAsync(deviceId, cancellationToken);
     }
 }

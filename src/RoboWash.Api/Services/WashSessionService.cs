@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using RoboWash.Api.Contracts;
 using RoboWash.Api.Data;
 using RoboWash.Api.Extensions;
 
@@ -25,13 +26,30 @@ public class WashSessionService(RoboWashDbContext db)
             LocationAddress = washLocation.Address,
             WashModeName = washMode.Name,
             PriceRub = washMode.PriceRub,
-            // Время ставит сервер: часы устройства пользователь волен перевести куда угодно.
-            WashedAt = DateTimeOffset.UtcNow,
+            // Время ставит сервер: часы устройства пользователь волен перевести куда угодно. Точность — секунда:
+            // большего истории не нужно, а дробную часть длиннее трёх знаков JavaScript разбирать не обязан.
+            WashedAt = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
         };
 
         db.WashSessions.Add(washSession);
         await db.SaveChangesAsync(cancellationToken);
 
         return washSession;
+    }
+    
+    public async Task<IReadOnlyList<WashSessionResponse>> GetWashHistoryAsync(string deviceId, CancellationToken cancellationToken)
+    {
+        return await db.WashSessions
+            .Where(s => s.DeviceId == deviceId)
+            .OrderByDescending(s => s.WashedAt)
+            .Select(s => new WashSessionResponse
+            {
+                Id = s.Id,
+                LocationAddress = s.LocationAddress,
+                WashModeName = s.WashModeName,
+                PriceRub = s.PriceRub,
+                WashedAt = s.WashedAt,
+            })
+            .ToListAsync(cancellationToken);
     }
 }
