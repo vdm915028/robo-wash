@@ -21,6 +21,8 @@ public class RoboWashApiFixture : IAsyncLifetime
 
     public HttpClient Client { get; private set; } = null!;
 
+    public IServiceProvider Services => _api!.Services;
+
     public async Task InitializeAsync()
     {
         await _postgres.StartAsync();

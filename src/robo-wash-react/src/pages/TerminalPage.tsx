@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { createWashSession } from '../api/washSessionsApi';
 import { useWashLocationById } from '../context/WashLocationsContext';
+import { useDeviceId } from '../hooks/useDeviceId';
 
 const washModeButtonBaseClasses = 'flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left';
 const payButtonClasses =
@@ -10,7 +12,10 @@ export function TerminalPage() {
     const { locationId } = useParams();
     const navigate = useNavigate();
     const { washLocation, isLoading } = useWashLocationById(locationId);
+    const deviceId = useDeviceId();
     const [selectedWashModeId, setSelectedWashModeId] = useState<number | null>(null);
+    const [isPaying, setIsPaying] = useState(false);
+    const [paymentFailed, setPaymentFailed] = useState(false);
 
     // Пока справочник едет, показывать нечего, но и уводить с экрана нельзя: по прямой ссылке
     // пользователь улетел бы на карту ещё до того, как выяснится, есть такая локация или нет.
@@ -25,11 +30,31 @@ export function TerminalPage() {
     const selectedWashMode = washLocation.washModes.find(washMode => washMode.id === selectedWashModeId);
 
     // Демо-упрощение: платёжный провайдер не подключён, нажатие «Оплатить» сразу считается успешной оплатой.
-    const payAndStartWash = () => {
-        if (selectedWashMode) {
+    // А вот сессию записываем по-настоящему и ждём ответа сервера: не записалась — мойка не началась,
+    // иначе пользователь увидел бы отсчёт, а в истории потом не нашёл бы ничего.
+    const payAndStartWash = async () => {
+        if (!selectedWashMode) {
+            return;
+        }
+
+        setIsPaying(true);
+        setPaymentFailed(false);
+
+        try {
+            await createWashSession(deviceId, { washLocationId: washLocation.id, washModeId: selectedWashMode.id });
             navigate(`/locations/${washLocation.id}/wash/${selectedWashMode.id}`, { replace: true });
+        } catch (error: unknown) {
+            console.error('Не удалось записать сессию мойки', error);
+            setIsPaying(false);
+            setPaymentFailed(true);
         }
     };
+
+    const payButtonLabel = isPaying
+        ? 'Оплачиваем…'
+        : selectedWashMode
+          ? `Оплатить ${selectedWashMode.priceRub} ₽`
+          : 'Выберите режим мойки';
 
     return (
         <section className="absolute inset-x-0 bottom-0 flex max-h-[80dvh] flex-col rounded-t-3xl bg-white shadow-2xl">
@@ -77,8 +102,16 @@ export function TerminalPage() {
 
             {/* Нижний отступ уводит кнопку из-под логотипа 2GIS: он рисуется поверх шторки, убирать его нельзя. */}
             <div className="px-4 pt-3 pb-12">
-                <button type="button" disabled={!selectedWashMode} onClick={payAndStartWash} className={payButtonClasses}>
-                    {selectedWashMode ? `Оплатить ${selectedWashMode.priceRub} ₽` : 'Выберите режим мойки'}
+                {paymentFailed && (
+                    <p className="mb-2 text-center text-sm text-red-600">Оплата не прошла. Попробуйте ещё раз.</p>
+                )}
+                <button
+                    type="button"
+                    disabled={!selectedWashMode || isPaying}
+                    onClick={payAndStartWash}
+                    className={payButtonClasses}
+                >
+                    {payButtonLabel}
                 </button>
             </div>
         </section>
