@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="RoboWash.Api/RoboWash.Api.csproj" />
+  <Project Path="RoboWash.xUnit/RoboWash.xUnit.csproj" />
+</Solution>

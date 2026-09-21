@@ -35,7 +35,7 @@ finding, and neither are client tests: the client has none for now by decision.
 
 Start from `git diff main...HEAD --stat`, then the full diff; read a changed file whole wherever the diff alone
 does not show enough. Check what you can with the toolchain: the installed typings,
-`npm --prefix src/robo-wash-react run build` (it runs `tsc --noEmit`), `dotnet build RoboWash.slnx`, a grep, and
+`npm --prefix src/robo-wash-react run build` (it runs `tsc --noEmit`), `dotnet build src/RoboWash.slnx`, a grep, and
 for workflow changes `actionlint` from the `rhysd/actionlint` Docker image.
 
 Never start the app or drive it in a browser: that check runs separately, once, at the end of the client work and

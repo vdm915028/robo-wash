@@ -1,16 +1,21 @@
-// Собирает статичную страницу с перепиской из транскрипта сессии Claude Code.
-// Запуск: node tools/build-conversation-log.mjs <транскрипт.jsonl> <выходной.html> [начало последней реплики]
+// Собирает статичную страницу с перепиской из транскриптов сессии Claude Code.
+// Запуск: node tools/build-conversation-log.mjs <транскрипт.jsonl>... <выходной.html> [начало последней реплики]
 //
-// Транскрипты лежат в ~/.claude/projects/<проект>/<сессия>.jsonl. Каждый файл сессии содержит историю
-// с самого начала, поэтому достаточно последнего.
+// Транскрипты лежат в ~/.claude/projects/<проект>/<сессия>.jsonl. Сессия, продолженная после сжатия контекста,
+// пишется в новый файл: он начинается со сводки и заново содержит всё, что было после сжатия, а история до него
+// остаётся только в предыдущем файле. Поэтому транскрипты передаются от старого к новому. Файл ответвления —
+// сессии, в которой реплику потом отредактировали и пошли другим путём, — передавать не нужно.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { userInfo } from 'node:os';
 
-const [, , transcriptPath, outputPath, cutMarker] = process.argv;
+const args = process.argv.slice(2);
+const transcriptCount = args.findIndex(a => !a.endsWith('.jsonl'));
+const transcriptPaths = args.slice(0, transcriptCount === -1 ? args.length : transcriptCount);
+const [outputPath, cutMarker] = args.slice(transcriptPaths.length);
 
-if (!transcriptPath || !outputPath) {
-    console.error('Использование: node tools/build-conversation-log.mjs <транскрипт.jsonl> <выходной.html> [маркер]');
+if (transcriptPaths.length === 0 || !outputPath) {
+    console.error('Использование: node tools/build-conversation-log.mjs <транскрипт.jsonl>... <выходной.html> [маркер]');
     process.exit(1);
 }
 
@@ -22,6 +27,7 @@ const isNoise = text =>
     text.includes('<local-command-stdout>') ||
     text.startsWith('Caveat:') ||
     text.startsWith('Continue from where you left off') ||
+    text.startsWith('[Request interrupted') ||
     text.startsWith('I hit my usage limit');
 
 // Берём только текст: картинки и результаты инструментов в переписку не попадают.
@@ -37,14 +43,34 @@ const osUserName = userInfo().username;
 const scrub = text =>
     text.replace(/[\w.+-]+@[\w.-]+\.\w+/g, '[адрес скрыт]').split(osUserName).join('user');
 
+const readRows = path =>
+    readFileSync(path, 'utf8').split('\n').flatMap(line => {
+        try { return line.trim() ? [JSON.parse(line)] : []; } catch { return []; }
+    });
+
+const isCompactBoundary = row => row.type === 'system' && row.subtype === 'compact_boundary';
+
+// Из каждого файла берём отрезок от его первой границы сжатия (у первого файла — от начала) до последней
+// (у последнего — до конца): всё, что лежит за этими границами, есть в соседнем файле.
+const historyRows = () =>
+    transcriptPaths.flatMap((path, i) => {
+        const rows = readRows(path);
+        const boundaries = rows.flatMap((row, index) => (isCompactBoundary(row) ? [index] : []));
+        const isFirst = i === 0;
+        const isLast = i === transcriptPaths.length - 1;
+
+        const from = isFirst || boundaries.length === 0 ? 0 : boundaries[0] + 1;
+        const to = isLast || boundaries.length === 0 ? rows.length : boundaries.at(-1);
+
+        return rows.slice(from, to);
+    });
+
 const readDialogue = () => {
     const turns = [];
 
-    for (const line of readFileSync(transcriptPath, 'utf8').split('\n')) {
-        if (!line.trim()) continue;
-        let row;
-        try { row = JSON.parse(line); } catch { continue; }
-        if (row.isSidechain || row.isMeta) continue;
+    for (const row of historyRows()) {
+        // Сводку сжатия пишет не пользователь, а Claude Code, чтобы продолжить сессию, — в переписку она не идёт.
+        if (row.isSidechain || row.isMeta || row.isCompactSummary) continue;
         if (row.type !== 'user' && row.type !== 'assistant') continue;
 
         const text = textOf(row.message?.content).trim();
@@ -60,7 +86,9 @@ const readDialogue = () => {
     const dialogue = turns.map(t => ({ role: t.role, text: scrub(t.parts.join('\n\n')) }));
     if (!cutMarker) return dialogue;
 
-    const cut = dialogue.findIndex(m => m.role === 'user' && m.text.startsWith(cutMarker));
+    // Ищем с конца: одна и та же фраза вроде «закоммитил, смержил» за долгий проект встречается не раз, а маркер
+    // отмечает последнюю реплику.
+    const cut = dialogue.findLastIndex(m => m.role === 'user' && m.text.startsWith(cutMarker));
     if (cut === -1) throw new Error(`Реплика, начинающаяся с «${cutMarker}», в транскрипте не найдена`);
 
     return dialogue.slice(0, cut + 1);
@@ -246,9 +274,9 @@ const page = `<!doctype html>
 <div class="page">
 <header class="intro">
     <h1>RoboWash — переписка с агентом</h1>
-    <p>Работа над демо-приложением сети автоматических моек: от первой постановки задачи до опубликованного
-    в облаке клиента и дальше, к серверной части. Разработку ведёт Claude Code в роли оркестратора, проверку кода — отдельные
-    агенты: локально перед пул реквестом и в самом пул реквесте.</p>
+    <p>Работа над демо-приложением сети автоматических моек — с первой постановки задачи. Разработку ведёт
+    Claude Code в роли оркестратора, проверку кода — отдельные агенты: локально перед пул реквестом и в самом
+    пул реквесте.</p>
     <p>Здесь только диалог: реплики агента приведены целиком, но свёрнуты — разворачиваются по кнопке.
     Вызовы инструментов, вывод команд и отчёты проверяющих агентов опущены.</p>
 </header>
@@ -256,9 +284,8 @@ const page = `<!doctype html>
 ${messages}
 
 <footer class="outro">
-    <p>Лог обрывается там, где работа идёт прямо сейчас: клиент опубликован, собирается серверная часть.
-    Эту страницу собрал тот же агент, разобрав транскрипт переписки, — поэтому она и заканчивается
-    просьбой её обновить.</p>
+    <p>Лог обрывается там, где работа идёт прямо сейчас. Эту страницу собрал тот же агент, разобрав транскрипт
+    переписки, — поэтому она и заканчивается просьбой её обновить.</p>
 </footer>
 </div>
 <script>
