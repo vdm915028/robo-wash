@@ -25,6 +25,7 @@ builder.Services.AddDbContext<RoboWashDbContext>(options => options
     .UseSnakeCaseNamingConvention());
 
 builder.Services.AddScoped<WashLocationService>();
+builder.Services.AddScoped<WashSessionService>();
 
 var app = builder.Build();
 

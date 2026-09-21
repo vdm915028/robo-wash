@@ -12,7 +12,7 @@ client-side countdown), no bonuses.
 ```
 RoboWash.slnx             solution — Api and xUnit only, the client is not part of it
 src/RoboWash.Api/         net10.0 — Controllers, Services (+ Models), Data (DbContext, entities), Contracts,
-                          Enums, and the Dockerfile that builds its image
+                          Enums, Extensions, Utils, and the Dockerfile that builds its image
 src/RoboWash.xUnit/       integration tests: the API over a throwaway Postgres in a container
 src/robo-wash-react/      React + TypeScript (Vite), opened separately in VS Code; Dockerfile and nginx template
   src/api/                HTTP client + DTO types mirroring the API contracts
@@ -42,6 +42,13 @@ Code, identifiers and file names — English. UI strings — Russian. Comments m
 - Primary constructors for DI classes; captured parameters take no underscore prefix.
 - No interfaces without a second implementation — register concrete classes in DI.
 - Pure helper (no I/O, no state, nothing to mock) → static class. Needs I/O or per-request state → DI service.
+  Never inject a service only to reach a pure function it happens to contain — that is coupling with nothing
+  behind it.
+- Entities in `Data/` stay plain data with no behaviour, not even a rule stated purely in their own fields: the
+  shape of a row changes with the schema, a business rule changes with the business, and one file should not
+  answer to both. Such a rule is an extension method on the entity it is about, in `Extensions/`:
+  `washLocation.IsModeAvailable(washMode)` reads like the entity's own method while the entity stays plain data.
+  A pure helper that belongs to no single type goes to `Utils/`.
 - Skip ceremony modifiers (`sealed`, blanket `readonly`, `[Pure]`) — write it the way a developer would, not the
   way an analyzer suggests.
 - Controllers are not thin pass-throughs: an action must not reduce to `return _xService.X(...)` under the same
@@ -86,6 +93,11 @@ Code, identifiers and file names — English. UI strings — Russian. Comments m
 
 Comments explain WHY, not WHAT — what the code does must be readable from the name and the body. Non-obvious
 business rules, workarounds and deliberate demo shortcuts are exactly what deserves a comment.
+
+A redundant comment is noise, however true it is. Extracting code into a method or a class already says that it
+is reused or deserves a name of its own, so a comment restating that ("kept in one place because two callers
+need it") adds nothing. Neither does a comment that repeats one written elsewhere: the snapshot columns of a wash
+session are explained once, on the entity, not at every place that fills them.
 
 ## Formatting
 

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RoboWash.Api.Data;
-using RoboWash.Api.Enums;
+using RoboWash.Api.Extensions;
 using RoboWash.Api.Services.Models;
 
 namespace RoboWash.Api.Services;
@@ -15,9 +15,7 @@ public class WashLocationService(RoboWashDbContext db)
         return locations.Select(l => new WashLocationWithModes
         {
             Location = l,
-            AvailableModes = l.RobotEquipmentGeneration == RobotEquipmentGeneration.Modern
-                ? allModes
-                : allModes.Where(m => !m.RequiresModernEquipment).ToList()
+            AvailableModes = allModes.Where(m => l.IsModeAvailable(m)).ToList()
         }).ToList();
     }
 }
