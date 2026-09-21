@@ -119,7 +119,7 @@ flowchart TD
 ## Структура репозитория
 
 ```
-RoboWash.slnx             солюшн: Api и xUnit, клиент в него не входит
+src/RoboWash.slnx         солюшн: Api и xUnit, клиент в него не входит
 src/RoboWash.Api/         контроллеры, сервисы, EF Core (DbContext, сущности, контракты) и свой Dockerfile
 src/RoboWash.xUnit/       интеграционные тесты: API поднимается над одноразовым Postgres в контейнере
 src/robo-wash-react/      клиент, открывается отдельно в VS Code; свой Dockerfile и шаблон конфига nginx
@@ -164,7 +164,7 @@ npm --prefix src/robo-wash-react run dev
 Тесты:
 
 ```bash
-dotnet test RoboWash.slnx
+dotnet test src/RoboWash.slnx
 ```
 
 Образы целиком — тем же способом, каким их собирает CI. API берёт строку подключения из переменной

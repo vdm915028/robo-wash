@@ -27,7 +27,7 @@ a pull request cannot rewrite the rules it is judged by.
 ## Repository layout
 
 ```
-RoboWash.slnx             solution — Api and xUnit only, the client is not part of it
+src/RoboWash.slnx         solution — Api and xUnit only, the client is not part of it
 src/RoboWash.Api/         ASP.NET Core API (net10.0) and the Dockerfile that builds its image
 src/RoboWash.xUnit/       integration tests: the API over a throwaway Postgres in a container
 src/robo-wash-react/      React + TypeScript client (Vite), opened separately in VS Code; Dockerfile, nginx template

@@ -1,6 +1,0 @@
-<Solution>
-  <Folder Name="/src/">
-    <Project Path="src/RoboWash.Api/RoboWash.Api.csproj" />
-    <Project Path="src/RoboWash.xUnit/RoboWash.xUnit.csproj" />
-  </Folder>
-</Solution>

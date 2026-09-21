@@ -30,4 +30,4 @@ jobs:
 
       # Интеграционные тесты поднимают Postgres через Testcontainers — на ubuntu-раннере Docker уже есть.
       - name: Run tests
-        run: dotnet test RoboWash.slnx
+        run: dotnet test src/RoboWash.slnx
